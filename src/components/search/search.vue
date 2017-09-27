@@ -16,7 +16,7 @@
 	</div>
 	<div class="recently"></div>
 	<div class="zhida" v-if="zhida!==null" v-show="key!==''">
-		<div class="singer" v-if="zhida.zhida_singer" :data-singer="zhida.zhida_singer.singerMID" @click="toList(zhida.zhida_singer.singerMID,'singer',$event)">
+		<div class="singer" v-if="zhida.zhida_singer" :data-singer="zhida.zhida_singer.singerMID" @click.stop="$router.push({path:'singerlist',query: { id: zhida.zhida_singer.singerMID}})">
 			<img :src="zhida.zhida_singer.singerPic">
 			<div class="info">
 				<p class="name">歌手:{{zhida.zhida_singer.singerName}}</p>

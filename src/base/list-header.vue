@@ -1,7 +1,7 @@
 <template>
 	<div class="list-header">
 		<div class="bg">
-			<img :src="logo" alt="" :class="{active:(move == true)}">
+			<img :src="logo" alt="" :class="{active:(move == true),filter:(filter == true)}">
 		</div>
 		<div class="list-header-top">
 			<span class="back icon-back" @click="$router.go('-1')"></span>
@@ -28,6 +28,10 @@
 			type:{
 				type:String,
 				default:''
+			},
+			filter:{
+				type:Boolean,
+				default:true
 			}
 		},
 		data(){
@@ -54,14 +58,14 @@
 			position:absolute
 			left:0
 			top:0
-			height:100%
+			padding-top:-100%
 			width:100%
-			filter: blur(8px) brightness(.8)
+			filter: brightness(.8)
+			&.filter
+				filter: blur(8px) brightness(.8)
 			&.active
 				filter: blur(8px) brightness(.4)
 	.list-header-top
-		height:40px
-		line-height:40px
 		display: flex
 		text-align: center
 		color: #fff

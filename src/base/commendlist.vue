@@ -6,7 +6,7 @@
 		</div>
 		<div class="hotdiss">
 			<ul>
-				<li v-for="(item,index) in hotdiss" @click.stop="$router.push({path:'diss',query: { id: item.dissid}})" :data-dissid="item.dissid">
+				<li v-for="(item,index) in hotdiss" @click.stop="$router.push({path:'disslist',query: { id: item.dissid}})" :data-dissid="item.dissid">
 					<div class="img">
 						<div class="icon">
 							<span class="icon-try"></span>
@@ -25,7 +25,7 @@
 		</div>
 		<div class="album">
 			<ul>
-				<li v-for="(item,index) in album" @click.stop="$router.push({path:'album',query: { id: item.album_mid}})" :data-album="item.album_mid">
+				<li v-for="(item,index) in album" @click.stop="$router.push({path:'albumlist',query: { id: item.album_mid}})" :data-album="item.album_mid">
 					<div class="img">
 						<div class="icon">
 							<span class="date">{{item.public_time}}</span>

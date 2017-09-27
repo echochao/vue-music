@@ -1,7 +1,7 @@
 <template>
 	<div class="diss-list-slider" ref="listSlider">
 		<ul class="diss">
-			<li v-for="item in list" :data-id="item.dissid" @click.stop="$router.push({path:'diss',query: { id: item.dissid}})" class="border-1px">
+			<li v-for="item in list" :data-id="item.dissid" @click.stop="$router.push({path:'disslist',query: { id: item.dissid}})" class="border-1px">
 				<div class="text">
 					<p class="name">{{htmlDecode(item.dissname)}}</p>
 					<p class="info">

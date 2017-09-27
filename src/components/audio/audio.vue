@@ -37,7 +37,7 @@
 							<span class="singer icon"> - {{item.singer[0].name}}</span>
 						</div>
 						<div class="love icon-love" @click.stop=""></div>
-						<div class="delete icon-s-delate" @click.stop="deleteMusic({id:item.id})"></div>
+						<div class="delete icon-s-delete" @click.stop="deleteMusic({id:item.id})"></div>
 					</li>
 				</transition-group>
 			</div>
@@ -115,7 +115,10 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 				lyriclist_show : false,
 				listOption:{
 					notNextTick:true,
-					initialSlide : 0
+					initialSlide : 0,
+					onAfterResize:(swiper)=>{
+						this.$refs.bar.style.width = (0.72*window.innerWidth-16)+'px'
+					}
 				},
 				lyrics:null,
 				currentTime:0,
@@ -124,7 +127,8 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 				activeIndex:null,
 				isMove:false,
 				barProgress:0,
-				circularProgerss:0
+				circularProgerss:0,
+				autoNext:false
 			}
 		},
 		created(){
@@ -146,18 +150,17 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 				// this.$refs.audio.buffered.end(0)
 			})
 			this.$refs.audio.addEventListener('ended',()=>{
+				this.autoNext = true
 				this.mode == 0 ? this.setCurrentTime(0) : this.next({id:this.songid})
 			})
 			this.$refs.audio.addEventListener('timeupdate',()=>{
 				this.currentTime = this.$refs.audio.currentTime
 			})
-			if (this.songid !==null) {
+			if (this.songid !== null) {
 				this.getLyric(this.songid).then((data)=>{
 					let lyrics = Base64.Base64.decode(data).split('\n')
+					// console.log(lyrics)
 					this.lyrics = this.setLyric(lyrics)
-					this.$nextTick(()=>{
-						this.initLyricScroll()
-					})
 				})
 			}
 		},
@@ -192,9 +195,9 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 			initLyricScroll(){
 				if (this.lyricList) {
 					this.lyricList.refresh()
-					this.lyricList.scrollTo(0,0,0)
 				}else{
 					this.lyricList = new BScroll(this.$refs.lyricList,{click:true})
+					console.log(this.lyricList)
 				}	
 			},
 			LyricScrollTo(n){
@@ -208,7 +211,7 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 					if(!this.lyrics.time[n-1]){
 						t = (this.lyrics.time[n])*1000
 					}
-					this.lyricList.scrollToElement(dom[n],t,0,-180)
+					this.isMove ? this.lyricList.scrollToElement(dom[n],0,0,-180) : this.lyricList.scrollToElement(dom[n],t,0,-180)
 				}
 			},
 			getLyric(id){
@@ -338,16 +341,17 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 					this.lyrics = null
 					this.activeLyric = null
 					this.activeIndex = null
-					if (this.songid == null) {
+					if (n == null) {
 						this.musiclist_show = false
 						if (this.$refs.audio.paused == false) {
 							this.control()
 						}
 						return
 					}
-					if (!this.musiclist_show) {
+					if (!this.musiclist_show && this.autoNext == false) {
 						this.lyriclist_show = true
 					}
+					this.autoNext = false
 					if (this.$refs.audio.paused == true) {
 						this.control()
 					}
@@ -355,8 +359,8 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 						let lyrics = Base64.Base64.decode(data).split('\n')
 						this.lyrics = this.setLyric(lyrics)
 						this.$nextTick(()=>{
-							this.initLyricScroll()
-						})
+							this.initLyricScroll()	
+						})	
 					})
 				})
 			},
@@ -375,6 +379,7 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 			lyriclist_show(n){
 				if (n == false) {return}
 				this.$nextTick(()=>{
+					this.initLyricScroll()	
 					if (this.activeIndex == null) {return}
 					this.LyricScrollTo(this.activeIndex)
 				})	

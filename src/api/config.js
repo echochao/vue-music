@@ -41,14 +41,10 @@ export function dissApi(sort,begin,end){
 };
 export function dissInfo(id){
 	return{
-		url:'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg',
+		url:'http://shenchaoli.xyz/api/qq-music.php',
 		callback:'dissInfo',
 		params:(()=>{
-			return (Object.assign({
-				jsonpCallback:'dissInfo',
-				disstid:id,
-				type:1
-			},commonParams))
+			return ({url:'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg?type=1&onlysong=0&disstid='+id+'&jsonpCallback=dissInfo&format=jsonp&inCharset=utf8&outCharset=utf-8'})
 		})()
 	}
 };
@@ -171,3 +167,45 @@ export function lyricApi(id){
 		})()
 	}
 };
+export function singerList(key,page,num){
+	return{
+		url:'https://c.y.qq.com/v8/fcg-bin/v8.fcg?channel=singer&page=list',
+		callback:'singer',
+		params:(()=>{
+			return (Object.assign({
+				jsonpCallback:'singer',
+				key:key,
+				pagesize:num,
+				pagenum:page
+			},commonParams))
+		})()
+	}
+};
+
+export function rankList(){
+	return{
+		url:'https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_opt.fcg?page=index&format=html&v8debug=1',
+		callback:'jsonCallback',
+		params:(()=>{
+			return (Object.assign({
+				jsonpCallback:'jsonCallback'
+			},{}))
+		})()
+	}
+};
+export function rankInfo(id,date,begin,num){
+	return{
+		url:'https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?tpl=3&page=detail&type=top',
+		callback:'rankInfo',
+		params:(()=>{
+			return (Object.assign({
+				jsonpCallback:'rankInfo',
+				topid:id,
+				date:date,//2016-06-06
+				song_begin:begin,
+				song_num:num
+			},{}))
+		})()
+	}
+};
+

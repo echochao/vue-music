@@ -27,7 +27,7 @@
 						<i class="icon-people"></i>
 						<span class="text">歌手</span>
 					</router-link>
-					<router-link :to="{path:''}">
+					<router-link :to="{path:'rank'}">
 						<i class="icon-rank"></i>
 						<span class="text">排行</span>
 					</router-link>
@@ -119,6 +119,7 @@
 <style lang="stylus">
 @import '../../common/style/color.styl'
 .music
+	height:100%
 	.header
 		background:$main-color
 		.nav

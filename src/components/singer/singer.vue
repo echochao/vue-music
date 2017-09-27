@@ -1,68 +1,72 @@
 <template>
 	<div class="singer">
-		<v-list-header class="list-t" :logo="this.getSingerImg(singer.singer_mid)" :title="singer.singer_name" :type="''" v-if="singer!==null" ref="header"></v-list-header>
-		<div class="list-scroll" ref="listScroll">
+		<v-common-header :title="'歌手'"></v-common-header>
+		<div class="scroll" ref="scroll">
 			<div>
-				<div class="list-info" v-if="singer!==null" ref="info">
-					<div class="info-t">
-						<div class="logo">
-							<img :src="this.getSingerImg(singer.singer_mid)">
-						</div>
+				<div class="tag">
+					<div class="aera-tag">
+						<ul class="border-1px">
+							<li v-for="(item,index) in aeratag" @click.stop="aeratagActive = index" :data-key='item.key'><a href="javascript:;"  :class="{active:(index==aeratagActive)}">{{item.text}}</a></li>
+						</ul>
 					</div>
-					<div class="info-b">
-						<p class="people">{{singer.singer_name}}</p>
-					</div>				
+					<div class="sex-tag">
+						<ul class="border-1px" ref="tagbottom">
+							<li v-for="(item,index) in sextag" @click.stop="sextagActive = index" :data-key='item.key' ><a href="javascript:;" :class="{active:(index==sextagActive)}">{{item.text}}</a></li>
+						</ul>
+					</div>
 				</div>
-				<v-song-list-slider v-if="singer!==null" :list="singer.list" :more="true" :top="true"></v-song-list-slider>
+				<div class="hot-line"><span>热门</span><span> {{aeratag[aeratagActive].text}}</span>
+					<span v-if="sextagActive!==null">{{sextag[sextagActive].text}}</span></div>
+				<div class="result">
+					<ul v-if="result !== null">
+						<li v-for="item in result.list" :data-id="item.Fsinger_mid" @click.stop="$router.push({path:'singerlist',query: { id: item.Fsinger_mid}})">
+							<img :src="getSingerImg(item.Fsinger_mid)">
+							<div class="text">
+								<p class="name">{{item.Fsinger_name}}</p>
+								<span class="icon-back"></span>
+							</div>
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script type="text/javascript">
-	import BScroll from 'better-scroll'
-	import {singerInfo} from '@/api/config.js'
-	import {isTitleMove} from '@/common/js/common.js'
-	import SongListSlider from '@/base/song-list-slider'
-	import ListHeader from '@/base/list-header'
+import BScroll from 'better-scroll'
+import CommonHeader from '@/base/common-header.vue'
+import {singerList} from "@/api/config.js" 
 	export default{
 		data(){
 			return{
-				singer:null,
-				pending:false,
-				begin:0,
-				num:20,
-				end:false,
+				aeratag:[{text:'全部',key:'all'},{text:'华语',key:'cn'},{text:'韩国',key:'k'},{text:'日本',key:'j'},{text:'欧美',key:'eu'}],
+				aeratagActive:0,
+				sextag:[{text:'男',key:'man'},{text:'女',key:'woman'},{text:'组合',key:'team'}],
+				sextagActive:null,
+				page:1,
+				size:100,
+				result:null
 			}
 		},
-		components:{
-			'v-song-list-slider':SongListSlider,
-			'v-list-header':ListHeader
-		},
-		activated(){
-			this.singer = null
-			this.begin = 0
-			this.end = false
-			this.pending = false
-			this.getSingerInfo(this.$route.query.id,this.begin,this.num)
+		mounted(){
+			this.getSingerList(this.key,this.page,this.size).then(()=>{
+				this.initScroll()
+			})
 		},
 		methods:{
-			getSingerInfo(id,b,n){
-				if (this.end ||this.penging) return
-				this.pending = true
-				let singerinfo = singerInfo(id,b,n)
-				this.$http.jsonp(singerinfo.url,{params:singerinfo.params,jsonpCallback:singerinfo.callback}).then((res)=>{
-					let singer = res.data.data
-					if (singer.total == this.begin) {this.end = true}
-					for (let i = 0; i <singer.list.length; i++) {
-						singer.list[i] = singer.list[i].musicData
-					}
-					if (this.singer == null) this.singer = singer
-					this.$set(this.singer,'list',this.singer.list.concat(singer.list))
-					this.begin = this.singer.list.length
-					this.pending = false
-					this.$nextTick(()=>{
-						this.initScroll()
+			getSingerList(key,page,num){
+				let t = singerList(key,page,num)
+				return new Promise((reslove,reject)=>{
+					this.$http.jsonp(t.url,{params:t.params,jsonpCallback:t.callback}).then((res)=>{
+						let result = res.data.data
+						if (this.result == null) {
+							this.result = result
+						}else{
+							this.$set(this.result,'list',this.result.list.concat(result.list))
+						}
+						this.page++
+						reslove()
 					})
 				})
 			},
@@ -70,68 +74,119 @@
 				return	'https://y.gtimg.cn/music/photo_new/T001R300x300M000'+id+'.jpg'
 			},
 			initScroll(){
-				if (this.listScroll) {
-					this.listScroll.refresh()
-					this.listScroll.pullupWatching ? this.listScroll.scrollTo(0,0,0) : this.listScroll.finishPullUp()
+				if (this.scroll) {
+					this.scroll.refresh()
+					this.scroll.pullupWatching ? this.scroll.scrollTo(0,0,0) : this.scroll.finishPullUp()
 				}else{
-					this.listScroll = new BScroll(this.$refs.listScroll,{pullUpLoad:true,click:true,probeType:3})
-					this.listScroll.on('pullingUp',()=>{
-						this.getSingerInfo(this.$route.query.id,this.begin,this.num)
-					})
-					this.listScroll.on('scroll',(pos)=>{
-						console.log(pos.y)
-						if (pos.y<0 && pos.y>-175) {
-							this.$refs.info.style.opacity = (pos.y+175)/175
-						}
-						if (this.$refs.header.move == null && pos.y<-175) {
-							this.$refs.header.move = isTitleMove(this.singer.singer_name,18,window.innerWidth-120)
-						}
-						if (this.$refs.header.move !== null && pos.y>-175) {
-							this.$refs.header.move = null
-						}
+					this.scroll = new BScroll(this.$refs.scroll,{pullUpLoad:true,click:true})
+					this.scroll.on('pullingUp',()=>{
+						this.getSingerList(this.key,this.page,this.size).then(()=>{
+							this.initScroll()
+						})
 					})
 				}
 			}
 		},
+		components:{
+			'v-common-header':CommonHeader
+		},
 		computed:{
-
-		}
+			key(){
+				if(this.aeratagActive == 0){
+					return 'all_all_all'
+				}
+				if (this.sextagActive == null) {
+					this.sextagActive = 0
+				}
+				return this.aeratag[this.aeratagActive].key +'_'+ this.sextag[this.sextagActive].key+'_all'
+			}
+		},
+		watch:{
+			key(n){
+				this.result = null
+				this.page = 1
+				this.getSingerList(n,this.page,this.size).then(()=>{
+					this.initScroll()
+				})
+			}
+		}	
 	}
 </script>
 
 <style lang="stylus">
+@import "../../common/style/color.styl"
+@import "../../common/style/mixim.styl"
+
 .singer
-	.list-t
-		display: fixed
-	.list-scroll
+	height:100%
+	.scroll
 		position:absolute
 		width:100%
-		z-index:99
-		top:40px
+		top:45px
 		bottom:0
-		overflow:hidden	
-		.list-info
-			height: 225px
-			width: 100%
-			padding-left:15px
-			padding-right:15px
-			box-sizing: border-box
-			line-height:50px
-			position:relative
-			overflow:hidden
-			text-align: center
-			.info-t
-				box-sizing: border-box
-				padding: 15px
-				height:175px
-				width:100%
+		overflow:hidden
+		.tag
+			background:#f4f4f4
+			.aera-tag,.sex-tag
 				overflow:hidden
-				img
-					height:145px
-					width:145px
-			.info-b
-				height:50px
-				line-height:50px
-				font-size: 18px
-				color:#fff		
-</style>			
+				ul
+					font-size: 0
+					white-space: nowrap
+					border-bottom-1px($border-color)
+					li
+						display: inline-block
+						height:40px
+						line-height:40px
+						padding:0 10px
+						a
+							font-size: 14px
+							color:#000
+							&.active
+								color:$main-color
+		.hot-line
+			height:30px
+			line-height:30px
+			background:#eaeaea
+			padding:0 10px
+			span
+				font-size: 12px	
+		.result
+			ul
+				padding-bottom:56px
+				li
+					height:55px
+					padding:5px 10px 0px
+					display: flex
+					box-sizing: border-box
+					img
+						height:45px
+						width:45px
+						flex: 0 0 45px
+						border-radius:50%
+						margin:0 px
+					.text
+						flex:1
+						display: flex
+						padding: 0 0 5px 10px
+						overflow: hidden
+						border-bottom-1px($border-color)
+						p
+							flex:1
+							line-height:45px
+							text-overflow: ellipsis
+							white-space:nowrap
+							overflow:hidden
+						span
+							flex:0 0 30px
+							width:30px
+							line-height:45px
+							text-align: center
+							transform: rotate(180deg)
+							transform-origin: 50% 50%	
+					&:last-child
+						.text
+							border-none()						
+					
+		
+</style>
+	

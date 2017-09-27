@@ -1,7 +1,7 @@
 <template>
 	<div class="album-list-slider" ref="listSlider">
 		<ul class="album">
-			<li v-for="item in list" :data-id="item.albumMID" class="border-1px" @click.stop="$router.push({path:'album',query: { id: item.albumMID}})">
+			<li v-for="item in list" :data-id="item.albumMID" class="border-1px" @click.stop="$router.push({path:'albumlist',query: { id: item.albumMID}})">
 				<div class="text">
 					<p class="name">{{item.albumName}}</p>
 					<p class="time">

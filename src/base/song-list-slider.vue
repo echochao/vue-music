@@ -7,14 +7,18 @@
 				<span>随机播放全部<i class="total-num">共{{list.length}}首</i></span>
 				</div>
 			</li>
-			<li v-for="item in list" :data-id="item.songid"  :class="{active:(music.id === item.songid)}" class="border-1px" @click.stop="selectMusic({id:item.songid,img:item.albummid,name:item.songname,singer:item.singer})">
+			<li v-for="item,index in list" :data-id="item.songid"  :class="{active:(music.id === item.songid)}" class="border-1px" @click.stop="selectMusic({id:item.songid,img:item.albummid,name:item.songname,singer:item.singer})">
 				<div class="text">
-					<p class="name"><i>{{item.songname}}</i><span class="icon-sq" v-show="item.sizeape"></span><span class="icon-hq" v-show="!item.sizeape"></span><span class="icon-dj" v-show="item.isonly == 1"></span><span class="icon-mv" v-show="item.media_mid"></span></p>
+					<div class="num" v-if="left">{{index+1}}</div>
+					<div class="no-num" v-else></div>
+					<div class="info">
+						<p class="name"><i>{{item.songname}}</i><span class="icon-sq" v-show="item.sizeape"></span><span class="icon-hq" v-show="!item.sizeape"></span><span class="icon-dj" v-show="item.isonly == 1"></span><span class="icon-mv" v-show="item.media_mid"></span></p>
 					<p class="singer">
 						<span v-for="(singer,index) in item.singer">{{singer.name}}<i v-if="index!=item.singer.length-1"> / </i></span>
 						<span v-if="item.albumname"> · {{item.albumname}}</span>
 					</p>
-					<i class="more icon-ellipsis"  @click.stop="" v-if="more"></i>
+					</div>
+					<div class="more icon-ellipsis"  @click.stop="" v-if="more"></div>
 				</div>
 			</li>
 		</ul>
@@ -32,6 +36,9 @@ import { mapMutations,mapGetters,mapActions} from 'vuex'
 				})
 			},
 			top:{
+				default: false
+			},
+			left:{
 				default: false
 			},
 			more:{
@@ -72,12 +79,13 @@ import { mapMutations,mapGetters,mapActions} from 'vuex'
 			height:52px
 			line-height:52px
 			margin-left:15px
-			padding:5px 0 5px 0
+			padding:6px 0 5px 0
 			border-bottom-1px($border-color)
 			box-sizing: border-box
 			&.top
 				display:flex
-				padding-right:15px
+				padding-left:15px
+				margin-left:0
 				line-height:40px
 				.top-l
 					flex:auto	
@@ -97,35 +105,40 @@ import { mapMutations,mapGetters,mapActions} from 'vuex'
 				border-none()	
 			.text
 				border-left:4px solid #fff
-				padding:0 50px 0 15px
+				height:40px
 				margin-left:-15px
-				position:relative
-				transition: all .3s					
-				p
-					line-height:20px
-				.name
-					font-size: 16px
-					display: flex
-					i
-						overflow:hidden
-						text-overflow: ellipsis
+				display: flex
+				transition: all .3s
+				.num
+					flex: 0 0 30px
+					text-align: center
+					line-height:40px
+				.no-num
+					flex: 0 0 15px						
+				.info
+					flex:1
+					overflow:hidden
+					.name
+						font-size: 16px
+						line-height:20px
+						display: flex
+						i
+							overflow:hidden
+							text-overflow: ellipsis
+							white-space: nowrap
+						span
+							flex: 0 0 20px
+							text-align: center
+					.singer
+						font-size: 12px
+						line-height:20px
+						color:$singer-color
+						overflow: hidden
+						text-overflow:ellipsis
 						white-space: nowrap
-					span
-						flex: 0 0 20px
-						text-align: center
-				.singer
-					font-size: 12px
-					color:$singer-color
-					overflow: hidden
-					text-overflow:ellipsis
-					white-space: nowrap
 				.more
-					position:absolute
-					height:52px
-					line-height:52px
-					width:50px
-					right:0
-					top:-6px
+					flex: 0 0 50px
+					line-height:40px
 					text-align: center
 					font-size: 20px	
 					color:$more-color
