@@ -1,5 +1,5 @@
 <template>
-	<div class="music">
+	<div class="music animated fadeInLeft">
 		<div class="header">
 			<div class="nav">
 				<div class="nav-l">
@@ -118,6 +118,7 @@
 
 <style lang="stylus">
 @import '../../common/style/color.styl'
+
 .music
 	height:100%
 	.header

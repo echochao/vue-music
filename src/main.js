@@ -8,6 +8,7 @@ import VueResource from 'vue-resource'
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import './common/style/index.styl'
 import 'swiper/dist/css/swiper.css'
+import 'animate.css'
 
 Vue.use(VueResource)
 Vue.use(VueAwesomeSwiper)

@@ -1,7 +1,8 @@
 <template>
 	<div class="audio">
 		<audio controls id="audio" ref="audio":src="songurl"></audio>
-		<div class="control" v-if='songurl!==null'>
+		<transition name="control">
+			<div class="control" v-if='songurl!==null' v-show="!musiclist_show">
 			<div class="info">
 				<img alt="" :src="imgurl" @click.stop="lyriclist_show = true" class="rotate" :class="{paused:(playing==false)}">
 				<div>
@@ -17,6 +18,8 @@
 				<span class="icon-music-list" @click.stop="musiclist_show = !musiclist_show"></span>
 			</div>
 		</div>
+		</transition>
+		<transition name="control">
 		<div class="music-list-wrap" @click.stop="" v-show="musiclist_show && musiclist.length>0">
 			<div class="bar border-1px">
 				<div class="play-mode">
@@ -45,6 +48,7 @@
 				<span>关闭</span>
 			</div>
 		</div>
+		</transition>
 		<div class="player" v-show="lyriclist_show">
 			<div class="bg">
 				<img :src="imgurl" alt="" v-if="imgurl!==null"></img>
@@ -416,6 +420,16 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 	0%   {transform: rotateZ(0deg)}
 	100% {transform: rotateZ(360deg)}
 	
+.control-enter-active
+	transition: all .5s .5s
+.control-leave-active
+	transition: all .5s
+.control-enter
+	transform: translateY(100%)
+.control-leave-to
+	transform: translateY(100%)		
+		
+	
 .audio
 	width:100%
 	position:fixed
@@ -656,8 +670,8 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 					display: inline-block
 					position:relative
 					height:0
-					padding-top:80%
-					width:80%
+					padding-top:100%
+					width:100%
 					img
 						position:absolute
 						height:100%

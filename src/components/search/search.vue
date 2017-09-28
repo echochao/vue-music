@@ -1,5 +1,5 @@
 <template>
-	<div class="search-wrap">
+	<div class="search-wrap  animated fadeInDown">
 	<div class="search">
 		<input autofocus="autofocus" type="text" placeholder="搜索音乐、歌词、歌单" v-model="key" @change="search()" @keyup=""></input>
 		<span @click="$router.go('-1')" class="back">取消</span>
@@ -322,6 +322,7 @@
 @import '../../common/style/color.styl'
 
 .search-wrap
+	height:100%
 	.search
 		position:relative
 		background:$main-color

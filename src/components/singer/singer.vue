@@ -1,5 +1,5 @@
 <template>
-	<div class="singer">
+	<div class="singer  animated fadeInLeft">
 		<v-common-header :title="'歌手'"></v-common-header>
 		<div class="scroll" ref="scroll">
 			<div>
